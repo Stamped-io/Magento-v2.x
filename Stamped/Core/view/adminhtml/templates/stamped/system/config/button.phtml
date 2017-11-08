@@ -1,0 +1,20 @@
+<div style="width: 245px; min-height: 120px; padding: 20px;">
+        <button id="<?php echo $block->getHtmlId() ?>" onclick="create();return false;">
+        <span><span><span><?php echo $block->escapeHtml($block->getButtonLabel()); ?></span></span></span>
+    </button>
+</div>
+<script type="text/javascript">
+    //<![CDATA[
+    function create() {
+        new Ajax.Request('<?php echo $block->getInternUrl() ?>', {
+            method:     'post',
+            onSuccess: function(transport){
+ 
+            if (transport.responseText == 'success'){
+                //window.location.reload();
+            }
+            }
+        });
+    }
+    //]]>
+</script>

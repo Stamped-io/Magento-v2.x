@@ -1,0 +1,10 @@
+<script>
+    function stampedInit(){
+		StampedFn.init({
+			apiKey: '<?php echo $this->getApiKey(); ?>',
+			storeUrl: '<?php echo $this->getApiStoreUrl(); ?>'
+		});
+    }
+    </script>
+<script async onload="stampedInit()" type="text/javascript" src="https://cdn-stamped-io.azureedge.net/files/widget.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn-stamped-io.azureedge.net/files/widget.min.css">
