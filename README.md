@@ -1,6 +1,6 @@
 # Magento-v2.x
 
-Latest working extension for Magento version 1.x
+Latest working extension for Magento version 2.x
 
 Installation Instructions:
 
