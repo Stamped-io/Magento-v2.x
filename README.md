@@ -8,3 +8,4 @@ Installation Instructions:
 <br> > then use terminal to go to magento root and give 777 permission to var, pub folder
 <br> > then run setup upgrade command : php bin/magento setup:upgrade
 <br> > then again give 777 permission to var, pub folder
+<br> > Change permission back to previous state
