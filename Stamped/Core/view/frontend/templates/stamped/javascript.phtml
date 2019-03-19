@@ -1,10 +1,22 @@
 <script>
-    function stampedInit(){
-		StampedFn.init({
-			apiKey: '<?php echo $this->getApiKey(); ?>',
-			storeUrl: '<?php echo $this->getApiStoreUrl(); ?>'
-		});
+function initStampedJS(){
+  (function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.onload=initStamped,e.src="//cdn-stamped-io.azureedge.net/files/widget.min.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+}
+
+function initStamped(){
+  StampedFn.init({
+    apiKey: '<?php echo $this->getApiKey(); ?>',
+    storeUrl: '<?php echo $this->getApiStoreUrl(); ?>'
+	});
+}
+    
+function deferStampedJS(method) {
+    if (window.jQuery) {
+			initStampedJS();
+    } else {
+      setTimeout(function() { 
+      deferStampedJS(initStampedJS) }, 1000);
     }
-    </script>
-<script async onload="stampedInit()" type="text/javascript" src="https://cdn-stamped-io.azureedge.net/files/widget.min.js"></script>
-<link rel="stylesheet" type="text/css" href="//cdn-stamped-io.azureedge.net/files/widget.min.css">
+}
+deferStampedJS(initStampedJS);
+</script>
