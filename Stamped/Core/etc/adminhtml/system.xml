@@ -27,7 +27,7 @@
                 <label>Settings</label>
                 <comment>
             <![CDATA[
-                  <p>Please enter the following API Public & Private Key, you can grab the keys from your Stamped.io Profile's page here: <a href="http://go.stamped.io/#/app/settings">http://go.stamped.io/#/app/settings</a></p>
+                  <p>Please enter the following API Public & Private Key, you can grab the keys from your Stamped.io Profile's page here: <a href="http://go.stamped.io/v3/#/">http://go.stamped.io/v3/#/</a></p>
                   ]]>
           </comment>
                 <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">

@@ -124,19 +124,28 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\File\Size $fileSize,
         \Magento\Framework\HTTP\Adapter\FileTransferFactory $httpFactory,
+		\Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\MediaStorage\Model\File\UploaderFactory $fileUploaderFactory,
         \Magento\Framework\Filesystem\Io\File $ioFile,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Image\Factory $imageFactory
+        \Magento\Framework\Image\Factory $imageFactory,
+		\Magento\Catalog\Helper\Image $imgHelper,
+		\Magento\Framework\Escaper $escaper,
+		\Magento\Store\Model\App\Emulation $appEmulation
     ) {
         $this->_scopeConfig = $scopeConfig;
         $this->filesystem = $filesystem;
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
         $this->httpFactory = $httpFactory;
+		$this->_productRepository = $productRepository;    
         $this->_fileUploaderFactory = $fileUploaderFactory;
         $this->_ioFile = $ioFile;
         $this->_storeManager = $storeManager;
         $this->_imageFactory = $imageFactory;
+		$this->_imgHelper = $imgHelper;
+		$this->_escaper = $escaper;
+ 		$this->_appEmulation = $appEmulation;
+
         parent::__construct($context);
     }
     
@@ -300,74 +309,51 @@ public function isConfigured($store)
 
 	public function getOrderProductsData($order) 
 	{
-        /*    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $objectManager->get('Magento\Store\Model\StoreManagerInterface')->setCurrentStore($order->getStoreId());
-            
-           $products = $order->getAllVisibleItems();
-		$products_arr = array();
-		
-		foreach ($products as $product) {
-		  $full_product = $objectManager->get('Magento\Catalog\Model\ProductRepository')->get($product->getSku()); 
-		  $parentId = $product->getProduct()->getId(); 
-		  if (!empty($parentId)) {
-				  $full_product = $objectManager->get('Magento\Catalog\Model\ProductRepository')->getById($parentId);
-		  }
-
-			$product_data = array();
-
-			$product_data['productId'] = $full_product->getId();
-			$product_data['productDescription'] = strip_tags($full_product->getDescription());
-			$product_data['productTitle'] = $full_product->getName();
-
-			try 
-			{
-				$product_data['productUrl'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
-				$product_data['productImageUrl'] = $objectManager->get('\Magento\Catalog\Helper\Image')->init($full_product, 'product_thumbnail_image')->getUrl();
-			} catch(Exception $e) {}
+		$this->_storeManager->setCurrentStore($order->getStoreId());
+			$products = $order->getAllVisibleItems(); //filter out simple products
+			$products_arr = array();
 			
-			$product_data['productPrice'] = $product->getPrice();
+			foreach ($products as $item) {
+				$full_product = $this->_productRepository->get($item->getSku());
+				$parentId = $item->getProduct()->getId();
+				if (!empty($parentId)) {
+					$full_product = $this->_productRepository->getById($parentId);
+				}
+				$specs_data = array();
+				$product_data = array();
+				$product_data['productId'] = $full_product->getId();
+				$product_data['productTitle'] = $full_product->getName();
+				$product_data['productUrl'] = '';
+				$product_data['productImageUrl'] = '';
+				try {
+					$product_data['productUrl'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
+					
+					$this->_appEmulation->startEnvironmentEmulation($order->getStoredId(), \Magento\Framework\App\Area::AREA_FRONTEND, true);
+					$product_data['productImageUrl'] = $this->_imgHelper->init($full_product, 'product_base_image')->getUrl();
+					$this->_appEmulation->stopEnvironmentEmulation();
 
-			$products_arr[] = $product_data;
-		}
+					if ($full_product->getUpc()) {
+						$specs_data['prouctBarcode'] = $full_product->getUpc();
+					}
+					if ($full_product->getBrand()) {
+						$specs_data['productBrand'] = $full_product->getBrand();
+					}
+					if ($full_product->getMpn()) {
+						$specs_data['productSKU'] = $full_product->getMpn();
+					}
+				} catch (Exception $e) {
+				}
+				$rawdescription =  str_replace(array('\'', '"'), '', $full_product->getDescription()); 
+				$description =  $this->_escaper->escapeHtml(strip_tags($rawdescription));
+				$product_data['productDescription'] = $description;
+				$product_data['productPrice'] = $item->getPrice();
+				$products_arr[] = $product_data;
+			}
 
-		return $products_arr;*/
-
-		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $objectManager->get('Magento\Store\Model\StoreManagerInterface')->setCurrentStore($order->getStoreId());
-            
-           $products = $order->getAllVisibleItems(); //filter out simple products
-		$products_arr = array();
-		
-		foreach ($products as $product) {
-			//use configurable product instead of simple if still needed
-            $full_product = $objectManager->get('Magento\Catalog\Model\Product')->load($product->getProductId());
-
-            $configurable_product_model = $objectManager->get('Magento\ConfigurableProduct\Model\Product\Type\Configurable');
-            $parentIds= $configurable_product_model->getParentIdsByChild($full_product->getId());
-            if (count($parentIds) > 0) {
-            	$full_product = $objectManager->get('Magento\Catalog\Model\Product')->load($parentIds[0]);
-            }
-
-			$product_data = array();
-
-			$product_data['productId'] = $full_product->getId();
-			$product_data['productDescription'] = strip_tags($full_product->getDescription());
-			$product_data['productTitle'] = $full_product->getName();
-			try 
-			{
-            	$full_product2 = $objectManager->get('Magento\Catalog\Model\ProductRepository')->getById($full_product->getId());
-				$product_data['productUrl'] = $full_product2->getUrlInStore(array('_store' => $order->getStoreId()));
-				$product_data['productImageUrl'] = $objectManager->get('\Magento\Catalog\Helper\Image')->init($full_product2, 'product_thumbnail_image')->getUrl();
-
-			} catch(Exception $e) {}
-			
-			$product_data['productPrice'] = $product->getPrice();
-
-			$products_arr[] = $product_data;
-		}
 
 		return $products_arr;
 	}
+
 
 	public function API_POST($path, $data, $store, $timeout=30) {
 	
@@ -510,7 +496,6 @@ public function isConfigured($store)
        	return $this->API_POST("/survey/reviews/bulk", $orders, $store);
 	}
         
-        
         public function saveOrderAfter($order)
         {
         
@@ -526,11 +511,9 @@ public function isConfigured($store)
 
             if (!$this->isConfigured($store_id))
             {
-                
                 return $this;
             }
             
-			
 			if (!in_array($order->getStatus(), $orderStatuses)) {
 				return $this;
 			}
@@ -539,6 +522,7 @@ public function isConfigured($store)
 			if (!$order->getCustomerIsGuest()) {
 				$data["user_reference"] = $order->getCustomerId();
 			}
+
 			// Get the id of the orders shipping address
 			$shippingId = $order->getShippingAddress()->getId();
                         $address = $objectManager->create('Magento\Customer\Model\Address')->load($shippingId);
@@ -550,8 +534,21 @@ public function isConfigured($store)
 
                         $data["customerId"] = $order->getCustomerId();
                         $data["email"] = $order->getCustomerEmail();
-                        $data["firstName"] = $order->getCustomerFirstname();
-                        $data["lastName"] = $order->getCustomerLastname();
+
+						$firstName = $order->getCustomerFirstname();
+						$lastName = $order->getCustomerLastname();
+						
+						try {
+							if (!$firstName && !$lastName) {
+								$firstName = $order->getBillingAddress()->getFirstname();
+								$lastName = $order->getBillingAddress()->getLastname();
+							} else {
+							}
+						} catch(Exception $e) {}
+						
+                        $data["firstName"] = $firstName;
+                        $data["lastName"] = $lastName;
+
                         $data["location"] = $address->getCountry();
                         $data['orderNumber'] = $order->getIncrementId();
                         $data['orderId'] = $order->getIncrementId();

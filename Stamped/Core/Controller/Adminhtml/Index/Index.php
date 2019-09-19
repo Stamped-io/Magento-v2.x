@@ -19,14 +19,14 @@ class Index extends \Magento\Backend\App\Action
     public function __construct(
         Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\ObjectManagerInterface $objectmanager,
+      //  \Magento\Framework\ObjectManagerInterface $objectmanager,
         PageFactory $resultPageFactory
     ) {
         parent::__construct($context);
-         $this->_storeManager = $storeManager;
-         $this->_objectManager = $objectmanager;
+        $this->_storeManager = $storeManager;
+      //  $this->_objectManager = $objectmanager;
         $this->resultPageFactory = $resultPageFactory;
-    }
+  }
 	
     /**
      * Check the permission to run it
@@ -45,13 +45,20 @@ class Index extends \Magento\Backend\App\Action
      */
     public function execute()
     {
+		$this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	//$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/stamped.log');
+	//$logger = new \Zend\Log\Logger();
+//$logger->addWriter($writer);
+//$logger->info('1');
+
         try {
             $helper = $this->_objectManager->create('Stamped\Core\Helper\Data');
             $current_store;
             $page = 0;
             $now = time();
-            $last = $now - (60*60*24*90); // 180 days ago
+            $last = $now - (60*60*24*180); // 180 days ago
             $from = date("Y-m-d", $last);
+			
 
             $store_code = $this->getRequest()->getParam('store');
 
@@ -65,13 +72,14 @@ class Index extends \Magento\Backend\App\Action
             }
 
             $store_id = $current_store->getId();
+			
 
             if ($helper->isConfigured($current_store) == false)
             {
                 Mage::app()->getResponse()->setBody('Please ensure you have configured the API Public Key and Private Key in Settings.');
                 return;   
             }
-
+			
             $salesOrder=$this->_objectManager->create('Magento\Sales\Model\Order');
             $orderStatuses = $helper->getConfigValue('core/stamped_settings/order_status_trigger', $current_store);
             if ($orderStatuses == null) {
@@ -85,25 +93,26 @@ class Index extends \Magento\Backend\App\Action
                     ->addFieldToFilter('store_id', $store_id)
                     ->addAttributeToFilter('created_at', array('gteq' =>$from))
                     ->addAttributeToSort('created_at', 'DESC')
-                    ->setPageSize(200);
+                    ->setPageSize(20);
             
+			
             $pages = $salesCollection->getLastPageNumber();
-		
+			
             do {
                 try {
                     $page++;
                     $salesCollection->setCurPage($page)->load();
                  
                     $orders = array();
-
+					
                     foreach($salesCollection as $order)
                     {
                         $order_data = array();
                        // Get the id of the orders shipping address
-			$shippingAddress = $order->getShippingAddress();
+						$shippingAddress = $order->getShippingAddress();
                         // Get shipping address data using the id
-			if(!empty($shippingAddress)) {
-			$address = $this->_objectManager->create('Magento\Customer\Model\Address')->load($shippingAddress->getId());
+						if(!empty($shippingAddress)) {
+							$address = $this->_objectManager->create('Magento\Customer\Model\Address')->load($shippingAddress->getId());
                             if (!empty($address)){
                                 $order_data["location"] = $address->getCountry();
                             }
@@ -113,35 +122,100 @@ class Index extends \Magento\Backend\App\Action
                             $order_data["userReference"] = $order->getCustomerEmail();
                         }
 
+						$firstName = $order->getCustomerFirstname();
+						$lastName = $order->getCustomerLastname();
+
+						try {
+							if (!$firstName && !$lastName) {
+								$firstName = $order->getBillingAddress()->getFirstname();
+								$lastName = $order->getBillingAddress()->getLastname();
+							} else {
+							}
+						} catch(Exception $e) {}
+
                         $order_data["customerId"] = $order->getCustomerId();
                         $order_data["email"] = $order->getCustomerEmail();
-                        $order_data["firstName"] = $order->getCustomerFirstname();
-                        $order_data["lastName"] = $order->getCustomerLastname();
+                        $order_data["firstName"] = $firstName;
+                        $order_data["lastName"] = $lastName;
                         $order_data['orderNumber'] = $order->getIncrementId();
                         $order_data['orderId'] = $order->getIncrementId();
                         $order_data['orderCurrencyISO'] = $order->getOrderCurrency()->getCode();
                         $order_data["orderTotalPrice"] = $order->getGrandTotal();
                         $order_data["orderSource"] = 'magento';
+
                         $order_data["orderDate"] = $order->getCreatedAt();
-                        $order_data['itemsList'] = $helper->getOrderProductsData($order);
+						
+                       // $order_data['itemsList'] = $helper->getOrderProductsData($order);
+
+
+						$this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->setCurrentStore($order->getStoreId());
+            
+					    $products = $order->getAllVisibleItems(); //filter out simple products
+						$products_arr = array();
+		
+						foreach ($products as $product) {
+						//use configurable product instead of simple if still needed
+						$full_product = $this->_objectManager->get('Magento\Catalog\Model\Product')->load($product->getProductId());
+
+				
+				if (!!$full_product->getId()){
+
+				$configurable_product_model = $this->_objectManager->get('Magento\ConfigurableProduct\Model\Product\Type\Configurable');
+				$parentIds= $configurable_product_model->getParentIdsByChild($full_product->getId());
+				if (count($parentIds) > 0) {
+            		$full_product = $this->_objectManager->get('Magento\Catalog\Model\Product')->load($parentIds[0]);
+				}
+			
+
+				$product_data = array();
+
+				$product_data['productId'] = $full_product->getId();
+				$product_data['productDescription'] = strip_tags($full_product->getDescription());
+				$product_data['productTitle'] = $full_product->getName();
+			
+				try 
+				{
+            		$full_product2 = $this->_objectManager->get('Magento\Catalog\Model\ProductRepository')->getById($full_product->getId());
+					$product_data['productUrl'] = $full_product2->getUrlInStore(array('_store' => $order->getStoreId()));
+					$product_data['productImageUrl'] = $this->_objectManager->get('\Magento\Catalog\Helper\Image')->init($full_product2, 'product_thumbnail_image')->getUrl();
+
+				} catch(Exception $e) {}
+			
+			
+				$product_data['productPrice'] = $product->getPrice();
+
+				$products_arr[] = $product_data;
+			}
+		}
+
+		$order_data['itemsList'] = $products_arr;
+		
+			//$logger->info('Array Log'.print_r($products_arr, true)); // Array Log
+
+
                         $order_data['apiUrl'] = $helper->getApiUrlAuth($current_store)."/survey/reviews/bulk";
 
                         $orders[] = $order_data;
 						
                     }
+
+					
                     if (count($orders) > 0) 
                     {
-			$result = $helper->createReviewRequestBulk($orders, $current_store);
+						$result = $helper->createReviewRequestBulk($orders, $current_store);
                     }
                 } catch (Exception $e) {
+				
                     return;
                 }
 
                 $salesCollection->clear();
 
             } while ($page <= (3000 / 200) && $page < $pages);
-
+			
+		
         } catch(Exception $e) {
+			//Mage::log('My variable: '.$e);
            return;
         }
         echo '1';

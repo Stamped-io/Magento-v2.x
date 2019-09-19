@@ -12,8 +12,8 @@ class Button extends \Magento\Config\Block\System\Config\Form\Field
      */
     public function __construct(
     \Magento\Backend\Block\Template\Context $context,
-            \Magento\Framework\App\Request\Http $request,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigObject
+    \Magento\Framework\App\Request\Http $request,
+    \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfigObject
     ) {
         $this->scopeConfigObject = $scopeConfigObject;
         $this->request = $request;
