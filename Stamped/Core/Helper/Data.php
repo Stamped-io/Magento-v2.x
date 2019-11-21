@@ -19,9 +19,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 	const STAMPED_API_SECRET_CONFIGURATION = 'core/stamped_settings/stamped_apisecret';
 	const STAMPED_STORE_URL_CONFIGURATION = 'core/stamped_settings/stamped_storeurl';
 
-	const STAMPED_SECURED_API_URL_DEVELOPMENT = "http://requestb.in/102buqg1";
-	const STAMPED_UNSECURED_API_URL_DEVELOPMENT = "http://requestb.in/102buqg1";
-	
 	const STAMPED_SECURED_API_URL = "https://%s:%s@stamped.io/api/%s";
     
     /**
@@ -319,7 +316,7 @@ public function isConfigured($store)
 				if (!empty($parentId)) {
 					$full_product = $this->_productRepository->getById($parentId);
 				}
-				$specs_data = array();
+
 				$product_data = array();
 				$product_data['productId'] = $full_product->getId();
 				$product_data['productTitle'] = $full_product->getName();
@@ -333,13 +330,13 @@ public function isConfigured($store)
 					$this->_appEmulation->stopEnvironmentEmulation();
 
 					if ($full_product->getUpc()) {
-						$specs_data['prouctBarcode'] = $full_product->getUpc();
+						$product_data['productBarcode'] = $full_product->getUpc();
 					}
 					if ($full_product->getBrand()) {
-						$specs_data['productBrand'] = $full_product->getBrand();
+						$product_data['productBrand'] = $full_product->getBrand();
 					}
 					if ($full_product->getMpn()) {
-						$specs_data['productSKU'] = $full_product->getMpn();
+						$product_data['productSKU'] = $full_product->getMpn();
 					}
 				} catch (Exception $e) {
 				}
@@ -500,14 +497,14 @@ public function isConfigured($store)
         {
         
         try {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-	$store_id = $order->getStoreId();
-	$orderStatuses = $this->getConfigValue('core/stamped_settings/order_status_trigger');
-	if ($orderStatuses == null) {
-            $orderStatuses = array('complete');
-	} else {
-            $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
-	}
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	        $store_id = $order->getStoreId();
+	        $orderStatuses = $this->getConfigValue('core/stamped_settings/order_status_trigger');
+	        if ($orderStatuses == null) {
+                $orderStatuses = array('complete');
+	        } else {
+                    $orderStatuses = array_map('strtolower', explode(',', $orderStatuses));
+	        }
 
             if (!$this->isConfigured($store_id))
             {
@@ -534,21 +531,25 @@ public function isConfigured($store)
 
                         $data["customerId"] = $order->getCustomerId();
                         $data["email"] = $order->getCustomerEmail();
-
-						$firstName = $order->getCustomerFirstname();
-						$lastName = $order->getCustomerLastname();
+					   
+					   /*--------------------start custom changes-----------------------------*/
+					   
+					    $fName = $order->getCustomerFirstname();
+						$lName = $order->getCustomerLastname();						
+						if(empty($fName) ||  $fName==''){
 						
-						try {
-							if (!$firstName && !$lastName) {
-								$firstName = $order->getBillingAddress()->getFirstname();
-								$lastName = $order->getBillingAddress()->getLastname();
-							} else {
-							}
-						} catch(Exception $e) {}
+							$fName = $order->getBillingAddress()->getFirstname();
+						}
 						
-                        $data["firstName"] = $firstName;
-                        $data["lastName"] = $lastName;
-
+						if(empty($lName) ||  $lName==''){
+						
+							$lName = $order->getBillingAddress()->getLastname();		
+						}					
+						$data["firstName"] = $fName;
+                        $data["lastName"] = $lName;	
+						
+						/*---------------------end custom changes----------------------------*/
+						
                         $data["location"] = $address->getCountry();
                         $data['orderNumber'] = $order->getIncrementId();
                         $data['orderId'] = $order->getIncrementId();
@@ -561,7 +562,9 @@ public function isConfigured($store)
                         $data["orderData"] = date('Y-m-d H:m:s');
                         }
                         $data['itemsList'] = $this->getOrderProductsData($order);
-			$data['platform'] = 'magento';
+						$data['platform'] = 'magento';
+						
+						
 
 			$this->createReviewRequest($data, $store_id);
 

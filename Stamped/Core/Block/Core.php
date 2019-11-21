@@ -212,6 +212,15 @@ class Core extends \Magento\Framework\View\Element\Template
     	return $productDescription;
     }
 
+    public function getProductSku()
+    {
+    	$_product = $this->getProduct();
+    	$productSku = $_product->getSku();
+
+    	return $productSku;
+    }
+
+
     public function getProductUrl()
     {
         $urlInterface = \Magento\Framework\App\ObjectManager::getInstance()->get('Magento\Framework\UrlInterface');

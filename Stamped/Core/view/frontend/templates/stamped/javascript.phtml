@@ -1,12 +1,41 @@
 <script>
 require([
 "jquery",
-"//cdn-stamped-io.azureedge.net/files/widget.min.js"
+"//cdn1.stamped.io/files/widget.min.js"
 ], function (jQuery) {
 
 StampedFn.init({
 apiKey: '<?php echo $this->getApiKey(); ?>',
 storeUrl: '<?php echo $this->getApiStoreUrl(); ?>'
+});
+
+
+function addEventListenerStamped(el, eventName, handler) { 
+   if (el.addEventListener) { el.addEventListener(eventName, handler); }
+   else { el.attachEvent('on' + eventName, function () { handler.call(el); }); } 
+}
+
+addEventListenerStamped(document, 'stamped:reviews:loaded', function(e) {
+    var ratingCount = jQuery('#stamped-main-widget meta[itemprop="reviewCount"]').attr('content');
+        var ratingValue = jQuery('#stamped-main-widget meta[itemprop="ratingValue"]').attr('content');
+
+        var richSnippet = {
+            "@id": window.location + "#",
+            "@context": "http://schema.org",
+            "@type": "Product",
+        }
+
+        if (parseInt(ratingValue) > 0){
+            richSnippet.aggregateRating = {
+                "@type": "AggregateRating",
+                "ratingValue": ratingValue,
+                "reviewCount": ratingCount
+            }
+        }
+        var script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.innerHTML = JSON.stringify(richSnippet);
+        document.getElementsByTagName('head')[0].appendChild(script);
 });
 
 })
@@ -15,7 +44,7 @@ storeUrl: '<?php echo $this->getApiStoreUrl(); ?>'
 <!--
 <script>
 function initStampedJS(){
-  (function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.onload=initStamped,e.src="//cdn-stamped-io.azureedge.net/files/widget.min.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+  (function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.onload=initStamped,e.src="//cdn1.stamped.io/files/widget.min.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
 }
 
 function initStamped(){

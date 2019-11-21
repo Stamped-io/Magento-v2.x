@@ -19,12 +19,6 @@ class Index extends \Magento\Backend\App\Action
     public function __construct(
         Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-      //  \Magento\Framework\ObjectManagerInterface $objectmanager,
-        PageFactory $resultPageFactory
-    ) {
-        parent::__construct($context);
-        $this->_storeManager = $storeManager;
-      //  $this->_objectManager = $objectmanager;
         $this->resultPageFactory = $resultPageFactory;
   }
 	
@@ -46,10 +40,6 @@ class Index extends \Magento\Backend\App\Action
     public function execute()
     {
 		$this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-	//$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/stamped.log');
-	//$logger = new \Zend\Log\Logger();
-//$logger->addWriter($writer);
-//$logger->info('1');
 
         try {
             $helper = $this->_objectManager->create('Stamped\Core\Helper\Data');
@@ -108,7 +98,7 @@ class Index extends \Magento\Backend\App\Action
                     foreach($salesCollection as $order)
                     {
                         $order_data = array();
-                       // Get the id of the orders shipping address
+                        // Get the id of the orders shipping address
 						$shippingAddress = $order->getShippingAddress();
                         // Get shipping address data using the id
 						if(!empty($shippingAddress)) {
@@ -129,7 +119,6 @@ class Index extends \Magento\Backend\App\Action
 							if (!$firstName && !$lastName) {
 								$firstName = $order->getBillingAddress()->getFirstname();
 								$lastName = $order->getBillingAddress()->getLastname();
-							} else {
 							}
 						} catch(Exception $e) {}
 
@@ -144,9 +133,6 @@ class Index extends \Magento\Backend\App\Action
                         $order_data["orderSource"] = 'magento';
 
                         $order_data["orderDate"] = $order->getCreatedAt();
-						
-                       // $order_data['itemsList'] = $helper->getOrderProductsData($order);
-
 
 						$this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->setCurrentStore($order->getStoreId());
             
@@ -158,48 +144,53 @@ class Index extends \Magento\Backend\App\Action
 						$full_product = $this->_objectManager->get('Magento\Catalog\Model\Product')->load($product->getProductId());
 
 				
-				if (!!$full_product->getId()){
+				        if (!!$full_product->getId()){
 
-				$configurable_product_model = $this->_objectManager->get('Magento\ConfigurableProduct\Model\Product\Type\Configurable');
-				$parentIds= $configurable_product_model->getParentIdsByChild($full_product->getId());
-				if (count($parentIds) > 0) {
-            		$full_product = $this->_objectManager->get('Magento\Catalog\Model\Product')->load($parentIds[0]);
-				}
+				            $configurable_product_model = $this->_objectManager->get('Magento\ConfigurableProduct\Model\Product\Type\Configurable');
+				            $parentIds= $configurable_product_model->getParentIdsByChild($full_product->getId());
+				            if (count($parentIds) > 0) {
+            		            $full_product = $this->_objectManager->get('Magento\Catalog\Model\Product')->load($parentIds[0]);
+				            }
 			
+				            $product_data = array();
 
-				$product_data = array();
-
-				$product_data['productId'] = $full_product->getId();
-				$product_data['productDescription'] = strip_tags($full_product->getDescription());
-				$product_data['productTitle'] = $full_product->getName();
+				            $product_data['productId'] = $full_product->getId();
+				            $product_data['productDescription'] = strip_tags($full_product->getDescription());
+				            $product_data['productTitle'] = $full_product->getName();
 			
-				try 
-				{
-            		$full_product2 = $this->_objectManager->get('Magento\Catalog\Model\ProductRepository')->getById($full_product->getId());
-					$product_data['productUrl'] = $full_product2->getUrlInStore(array('_store' => $order->getStoreId()));
-					$product_data['productImageUrl'] = $this->_objectManager->get('\Magento\Catalog\Helper\Image')->init($full_product2, 'product_thumbnail_image')->getUrl();
+				            try 
+				            {
+            		            $full_product2 = $this->_objectManager->get('Magento\Catalog\Model\ProductRepository')->getById($full_product->getId());
+					            $product_data['productUrl'] = $full_product2->getUrlInStore(array('_store' => $order->getStoreId()));
+					            $product_data['productImageUrl'] = $this->_objectManager->get('\Magento\Catalog\Helper\Image')->init($full_product2, 'product_base_image')->getUrl();
+                                $product_data['productUrl'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
 
-				} catch(Exception $e) {}
-			
-			
-				$product_data['productPrice'] = $product->getPrice();
+					            if ($full_product->getUpc()) {
+						            $product_data['productBarcode'] = $full_product->getUpc();
+					            }
+					            if ($full_product->getBrand()) {
+						            $product_data['productBrand'] = $full_product->getBrand();
+					            }
+					            if ($full_product->getMpn()) {
+						            $product_data['productSKU'] = $full_product->getMpn();
+					            }
 
-				$products_arr[] = $product_data;
-			}
-		}
+				            } catch(Exception $e) {}
 
-		$order_data['itemsList'] = $products_arr;
+				            $product_data['productPrice'] = $product->getPrice();
+
+				            $products_arr[] = $product_data;
+			            }
+		                }
+
+		                $order_data['itemsList'] = $products_arr;
 		
-			//$logger->info('Array Log'.print_r($products_arr, true)); // Array Log
-
-
                         $order_data['apiUrl'] = $helper->getApiUrlAuth($current_store)."/survey/reviews/bulk";
 
                         $orders[] = $order_data;
 						
                     }
 
-					
                     if (count($orders) > 0) 
                     {
 						$result = $helper->createReviewRequestBulk($orders, $current_store);
