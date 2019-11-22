@@ -24,21 +24,19 @@ class CoreLoader implements CoreLoaderInterface
     protected $url;
 
     /**
-     * @param \Stamped\Core\Model\CoreFactory $coreFactory
-     * @param OrderViewAuthorizationInterface $orderAuthorization
-     * @param Registry $registry
-     * @param \Magento\Framework\UrlInterface $url
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
-        \Stamped\Core\Model\CoreFactory $coreFactory,
-        Registry $registry,
-        \Magento\Framework\UrlInterface $url
+        Context $context,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        PageFactory $resultPageFactory
     ) {
-        $this->coreFactory = $coreFactory;
-        $this->registry = $registry;
-        $this->url = $url;
-    }
-
+        parent::__construct($context);
+        $this->_storeManager = $storeManager;
+        $this->resultPageFactory = $resultPageFactory;
+  }
+	
     /**
      * @param RequestInterface $request
      * @param ResponseInterface $response
