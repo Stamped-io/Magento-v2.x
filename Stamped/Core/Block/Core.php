@@ -140,17 +140,17 @@ class Core extends \Magento\Framework\View\Element\Template
     }
     public function getWidgetShow()
     {
-        return trim($this->_scopeConfig->getValue('core/stamped_settings/enable_widget', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/enable_widget', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
     }
     
     public function getApiKey()
     {
-        return trim($this->_scopeConfig->getValue('core/stamped_settings/stamped_apikey', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/stamped_apikey', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
     }
 	
     public function getApiStoreUrl()
     {
-        return trim($this->_scopeConfig->getValue('core/stamped_settings/stamped_storeurl', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/stamped_storeurl', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
     }
 
     public function setProduct($product)

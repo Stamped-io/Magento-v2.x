@@ -5,6 +5,8 @@ namespace Stamped\Core\Controller\AbstractController;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Registry;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\View\Result\PageFactory;
 
 class CoreLoader implements CoreLoaderInterface
 {

@@ -4,7 +4,7 @@
         <tab id="stamped" translate="label" sortOrder="1000">
             <label>Stamped.io</label>
         </tab>
-        <section id="core" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="stamped_core" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>
             <label>Stamped.io Reviews</label>
             <tab>stamped</tab>

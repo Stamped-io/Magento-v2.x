@@ -75,7 +75,7 @@ public function __construct(
             }
 			
             $salesOrder=$this->_objectManager->create('Magento\Sales\Model\Order');
-            $orderStatuses = $helper->getConfigValue('core/stamped_settings/order_status_trigger', $current_store);
+            $orderStatuses = $helper->getConfigValue('stamped_core/stamped_settings/order_status_trigger', $current_store);
             if ($orderStatuses == null) {
                 $orderStatuses = array('complete');
             } else {

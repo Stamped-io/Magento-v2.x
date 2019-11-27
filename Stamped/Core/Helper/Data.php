@@ -14,10 +14,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @var string
      */
-    const XML_PATH_ITEMS_PER_PAGE     = 'core/view/items_per_page';
-    const STAMPED_API_KEY_CONFIGURATION = 'core/stamped_settings/stamped_apikey';
-	const STAMPED_API_SECRET_CONFIGURATION = 'core/stamped_settings/stamped_apisecret';
-	const STAMPED_STORE_URL_CONFIGURATION = 'core/stamped_settings/stamped_storeurl';
+    const XML_PATH_ITEMS_PER_PAGE     = 'stamped_core/view/items_per_page';
+    const STAMPED_API_KEY_CONFIGURATION = 'stamped_core/stamped_settings/stamped_apikey';
+	const STAMPED_API_SECRET_CONFIGURATION = 'stamped_core/stamped_settings/stamped_apisecret';
+	const STAMPED_STORE_URL_CONFIGURATION = 'stamped_core/stamped_settings/stamped_storeurl';
 
 	const STAMPED_SECURED_API_URL = "https://%s:%s@stamped.io/api/%s";
     
@@ -499,7 +499,7 @@ public function isConfigured($store)
         try {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 	        $store_id = $order->getStoreId();
-	        $orderStatuses = $this->getConfigValue('core/stamped_settings/order_status_trigger');
+	        $orderStatuses = $this->getConfigValue('stamped_core/stamped_settings/order_status_trigger');
 	        if ($orderStatuses == null) {
                 $orderStatuses = array('complete');
 	        } else {
