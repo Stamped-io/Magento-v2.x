@@ -278,14 +278,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     }
     
     public function getConfig($config_path)
-{
-    return $this->scopeConfig->getValue(
+    {
+        return $this->scopeConfig->getValue(
             $config_path,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
             );
-}
+    }
 
-public function getConfigValue($field, $storeId = null)
+    public function getConfigValue($field, $storeId = null)
    {
        return $this->scopeConfig->getValue(
            $field,
@@ -293,7 +293,7 @@ public function getConfigValue($field, $storeId = null)
            $storeId
        );
    }
-public function isConfigured($store)
+    public function isConfigured($store)
 	{ 
     		//check if both app_key and secret exist
 		if(($this->getApiKey($store) == null) || ($this->getApiSecret($store) == null))
@@ -312,10 +312,11 @@ public function isConfigured($store)
 			
 			foreach ($products as $item) {
 				$full_product = $this->_productRepository->get($item->getSku());
-				$parentId = $item->getProduct()->getId();
-				if (!empty($parentId)) {
-					$full_product = $this->_productRepository->getById($parentId);
-				}
+
+				$parent = $item->getProduct();
+                if ($parent && !empty($parent->getId())) {
+	                $full_product = $this->_productRepository->getById($parent->getId());
+                }
 
 				$product_data = array();
 				$product_data['productId'] = $full_product->getId();
@@ -340,6 +341,7 @@ public function isConfigured($store)
 					}
 				} catch (Exception $e) {
 				}
+
 				$rawdescription =  str_replace(array('\'', '"'), '', $full_product->getDescription()); 
 				$description =  $this->_escaper->escapeHtml(strip_tags($rawdescription));
 				$product_data['productDescription'] = $description;
