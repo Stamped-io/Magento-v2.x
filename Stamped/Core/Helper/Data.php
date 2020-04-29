@@ -521,6 +521,10 @@ public function isConfigured($store)
 			}
 
 			// Get the id of the orders shipping address
+            if (!is_object($order->getShippingAddress())) {
+                return false;
+            }
+
 			$shippingId = $order->getShippingAddress()->getId();
                         $address = $objectManager->create('Magento\Customer\Model\Address')->load($shippingId);
 
