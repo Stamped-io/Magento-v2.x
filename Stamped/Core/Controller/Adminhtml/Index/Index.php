@@ -16,14 +16,20 @@ class Index extends \Magento\Backend\App\Action
      * @param Context $context
      * @param PageFactory $resultPageFactory
      */
-public function __construct(
+    public function __construct(
         Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        PageFactory $resultPageFactory
+        PageFactory $resultPageFactory,
+        \Magento\Framework\Image\Factory $imageFactory,
+		\Magento\Catalog\Helper\Image $imgHelper,
+		\Magento\Store\Model\App\Emulation $appEmulation
     ) {
         parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->resultPageFactory = $resultPageFactory;
+        $this->_imageFactory = $imageFactory;
+		$this->_imgHelper = $imgHelper;
+ 		$this->_appEmulation = $appEmulation;
   }
 	
     /**
@@ -147,7 +153,6 @@ public function __construct(
 						//use configurable product instead of simple if still needed
 						$full_product = $this->_objectManager->get('Magento\Catalog\Model\Product')->load($product->getProductId());
 
-				
 				        if (!!$full_product->getId()){
 
 				            $configurable_product_model = $this->_objectManager->get('Magento\ConfigurableProduct\Model\Product\Type\Configurable');
@@ -166,7 +171,11 @@ public function __construct(
 				            {
             		            $full_product2 = $this->_objectManager->get('Magento\Catalog\Model\ProductRepository')->getById($full_product->getId());
 					            $product_data['productUrl'] = $full_product2->getUrlInStore(array('_store' => $order->getStoreId()));
-					            $product_data['productImageUrl'] = $this->_objectManager->get('\Magento\Catalog\Helper\Image')->init($full_product2, 'product_base_image')->getUrl();
+
+					            $this->_appEmulation->startEnvironmentEmulation($order->getStoredId(), \Magento\Framework\App\Area::AREA_FRONTEND, true);
+					            $product_data['productImageUrl'] = $this->_imgHelper->init($full_product2, 'product_base_image')->getUrl();
+					            $this->_appEmulation->stopEnvironmentEmulation();
+
                                 $product_data['productUrl'] = $full_product->getUrlInStore(array('_store' => $order->getStoreId()));
 
 					            if ($full_product->getUpc()) {
