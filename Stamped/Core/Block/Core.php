@@ -31,6 +31,7 @@ class Core extends \Magento\Framework\View\Element\Template
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Customer\Model\Session $customerSession,
         \Stamped\Core\Model\ResourceModel\Core\CollectionFactory $coreCollectionFactory,
         \Stamped\Core\Helper\Data $dataHelper,
         \Magento\Framework\Registry $registry,
@@ -39,6 +40,8 @@ class Core extends \Magento\Framework\View\Element\Template
         $this->_coreCollectionFactory = $coreCollectionFactory;
         $this->_dataHelper = $dataHelper;
         $this->_registry = $registry;
+        $this->_customerSession = $customerSession;
+
         parent::__construct(
             $context,
             $data
@@ -138,19 +141,66 @@ class Core extends \Magento\Framework\View\Element\Template
 
         return NULL;
     }
+
     public function getWidgetShow()
     {
         return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/enable_widget', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+    }
+    
+    public function getLauncherShow()
+    {
+        return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings_rewards/enable_launcher', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
     }
     
     public function getApiKey()
     {
         return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/stamped_apikey', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
     }
+    
+    public function getApiKeySecret()
+    {
+        return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/stamped_apisecret', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+    }
 	
     public function getApiStoreUrl()
     {
         return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/stamped_storeurl', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+    }
+	
+    public function getApiStoreHash()
+    {
+        return trim($this->_scopeConfig->getValue('stamped_core/stamped_settings/stamped_storehash', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+    }
+
+    public function getRewardsInit()
+    {
+        $domainName = $this->getApiStoreUrl();
+		$public_key = $this->getApiKey();
+		$private_key = $this->getApiKeySecret();
+        $htmlLauncher = "<div id='stamped-rewards-init' class='stamped-rewards-init' data-key-public='%s' %s></div>";
+        $htmlLoggedInAttributes = "";
+
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $customerSession = $objectManager->create('Magento\Customer\Model\Session');
+
+        if ($customerSession->isLoggedIn()) {
+            //$customerSession->getCustomerId();  // get Customer Id
+            //$customerSession->getCustomerGroupId();
+            //$customerSession->getCustomer();
+            //$customerSession->getCustomerData();
+
+            $current_user = $customerSession->getCustomer(); 
+
+            $message = $current_user->getId() . $current_user->getEmail();
+
+            // to lowercase hexits
+            $hmacVal = hash_hmac('sha256', $message, $private_key);
+
+			$htmlLoggedInAttributesVal = "data-key-auth='%s' data-customer-id='%d' data-customer-email='%s' data-customer-first-name='%s' data-customer-last-name='%s' data-customer-orders-count='%d' data-customer-tags='%s' data-customer-total-spent='%d'";
+			$htmlLoggedInAttributes = sprintf($htmlLoggedInAttributesVal, $hmacVal, $current_user->getId(), $current_user->getEmail(), $current_user->getFirstname(), $current_user->getLastname(), "", "", "" );
+        }
+
+        return sprintf($htmlLauncher, $public_key, $htmlLoggedInAttributes);
     }
 
     public function setProduct($product)

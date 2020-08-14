@@ -1,80 +1,111 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
-    <system>
-        <tab id="stamped" translate="label" sortOrder="1000">
-            <label>Stamped.io</label>
-        </tab>
-        <section id="stamped_core" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
-            <class>separator-top</class>
-            <label>Stamped.io Reviews</label>
-            <tab>stamped</tab>
-            <resource>Stamped_Core::config_core</resource>
-            
-            <group id="stamped" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Stamped.io Reviews</label>
-                <comment>
-                        <![CDATA[
+  <system>
+    <tab id="stamped" translate="label" sortOrder="1000">
+      <label>Stamped.io</label>
+    </tab>
+    <section id="stamped_core" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+      <class>separator-top</class>
+      <label>Stamped.io Settings</label>
+      <tab>stamped</tab>
+      <resource>Stamped_Core::config_core</resource>
+
+      <group id="stamped" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Stamped.io Settings</label>
+        <comment>
+          <![CDATA[
                               <p>Stamped.io allows you to automatically send emails to your customers requesting for reviews of their recent purchase with you.</p>
                               <p>Edit the Settings by selecting store view from the "<strong>Current Configuration Scope</strong>" dropdown on the top of the left sidebar.</p>
                             ]]>
-                      </comment>
-                <field id="is_enabled" translate="label comment" type="hidden" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
-                </field>
-                
-                
-            </group>
-            <group id="stamped_settings" translate="label" type="text" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="1">
-                <label>Settings</label>
-                <comment>
-            <![CDATA[
+        </comment>
+        <field id="is_enabled" translate="label comment" type="hidden" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+        </field>
+
+
+      </group>
+      <group id="stamped_settings" translate="label" type="text" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="1">
+        <label>Reviews &amp; UGC Settings</label>
+        <comment>
+          <![CDATA[
                   <p>Please enter the following API Public & Private Key, you can grab the keys from your Stamped.io Profile's page here: <a href="http://go.stamped.io/v3/#/">http://go.stamped.io/v3/#/</a></p>
                   ]]>
-          </comment>
-                <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>API Public Key</label>
-                </field>
-                <field id="stamped_apisecret" translate="label" type="text" sortOrder="30" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>API Private Key</label>
-                </field>
-                 <field id="stamped_storeurl" translate="label" type="text" sortOrder="40" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>Store URL</label>
-                    <comment>
-                <![CDATA[
+        </comment>
+        <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>API Public Key</label>
+        </field>
+        <field id="stamped_apisecret" translate="label" type="text" sortOrder="30" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>API Private Key</label>
+        </field>
+        <field id="stamped_storeurl" translate="label" type="text" sortOrder="40" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>Store URL</label>
+          <comment>
+            <![CDATA[
                               This URL should match the one provided in your Stamped.io account
                               ]]>
-              </comment>
-                </field>
-                <field id="enable_widget" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>Show reviews widget in product page</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>
-                <![CDATA[
+          </comment>
+        </field>
+        <field id="stamped_storehash" translate="label" type="text" sortOrder="40" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>Store Hash</label>
+          <comment>
+            <![CDATA[
+                              This value should match the one provided in your Stamped.io account
+                              ]]>
+          </comment>
+        </field>
+        <field id="enable_widget" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>Show reviews widget in product page</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+          <comment>
+            <![CDATA[
                    Show reviews widget in product page
                 ]]>
-              </comment>
-                </field>
-                <field id="order_status_trigger" translate="label" type="text" sortOrder="60" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>Order status to trigger Review Requests Emails</label>
-                    <comment>
-                <![CDATA[
+          </comment>
+        </field>
+        <field id="order_status_trigger" translate="label" type="text" sortOrder="60" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>Order status to trigger Review Requests Emails</label>
+          <comment>
+            <![CDATA[
                               Set the order statuses that will trigger the review requests to be sent, example of commonly used statuses are "Complete", "Shipped," "Pending," or "Received.". Seperate multiple status with comma e.g. "Complete, Shipped"
                               ]]>
-              </comment>
-                </field>
-            </group>
-            <group id="stamped_import" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
-                <label>History Orders Import</label>
-                
-                <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
-                    <label>
-                <![CDATA[
+          </comment>
+        </field>
+      </group>
+
+      <group id="stamped_settings_rewards" translate="label" type="text" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="1">
+        <label>Loyalty &amp; Rewards Settings</label>
+        
+        <field id="enable_launcher" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>Show rewards launcher</label>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+          <comment>
+            <![CDATA[
+                   Show reviews widget in product page
+                ]]>
+          </comment>
+        </field>
+        <field id="order_status_trigger_rewards" translate="label" type="text" sortOrder="60" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>Order status to trigger Rewards</label>
+          <comment>
+            <![CDATA[
+                              Set the order statuses that will trigger the review requests to be sent, example of commonly used statuses are "Complete", "Shipped," "Pending," or "Received.". Seperate multiple status with comma e.g. "Complete, Shipped"
+                              ]]>
+          </comment>
+        </field>
+      </group>
+      
+      <group id="stamped_import" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
+        <label>History Orders Import</label>
+
+        <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
+          <label>
+            <![CDATA[
                               Import your existing orders history up to 6 months to Stamped.io. <br /><br /><i>If you need to import orders that is back-dated more than 6 months, please email us at hello@shopry.com</i>
                               ]]>
-              </label>
-              <frontend_model>Stamped\Core\Block\System\Config\Form\Field\Button</frontend_model>
-            </field>
-                
-            </group>
-        </section>
-    </system>
+          </label>
+          <frontend_model>Stamped\Core\Block\System\Config\Form\Field\Button</frontend_model>
+        </field>
+
+      </group>
+    </section>
+  </system>
 </config>

@@ -11,3 +11,8 @@ storeUrl: '<?php echo $this->getApiStoreUrl(); ?>'
 
 })
 </script>
+
+<?php 
+   if ($block->getLauncherShow()):?>
+<?php echo $this->getRewardsInit(); ?>
+<?php endif ?>
