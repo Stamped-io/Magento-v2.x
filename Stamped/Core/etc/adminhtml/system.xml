@@ -18,9 +18,8 @@
                               <p>Edit the Settings by selecting store view from the "<strong>Current Configuration Scope</strong>" dropdown on the top of the left sidebar.</p>
                             ]]>
         </comment>
-        <field id="is_enabled" translate="label comment" type="hidden" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+        <field id="is_enabled" translate="label comment" type="hidden" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
         </field>
-
 
       </group>
       <group id="stamped_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -71,10 +70,10 @@
         </field>
       </group>
 
-      <group id="stamped_settings_rewards" translate="label" type="text" sortOrder="10" showInDefault="0" showInWebsite="0" showInStore="1">
+      <group id="stamped_settings_rewards" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Loyalty &amp; Rewards Settings</label>
         
-        <field id="enable_launcher" translate="label" type="select" sortOrder="50" showInDefault="0" showInWebsite="0" showInStore="1">
+        <field id="enable_launcher" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Show rewards launcher</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <comment>
@@ -83,7 +82,7 @@
                 ]]>
           </comment>
         </field>
-        <field id="order_status_trigger_rewards" translate="label" type="text" sortOrder="60" showInDefault="0" showInWebsite="0" showInStore="1">
+        <field id="order_status_trigger_rewards" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Order status to trigger Rewards</label>
           <comment>
             <![CDATA[
@@ -93,10 +92,10 @@
         </field>
       </group>
       
-      <group id="stamped_import" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
+      <group id="stamped_import" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>History Orders Import</label>
 
-        <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="0" showInWebsite="0" showInStore="1">
+        <field id="stamped_apikey" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>
             <![CDATA[
                               Import your existing orders history up to 6 months to Stamped.io. <br /><br /><i>If you need to import orders that is back-dated more than 6 months, please email us at hello@stamped.io</i>
