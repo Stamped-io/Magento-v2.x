@@ -324,9 +324,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                 {
                     $product_data['productBrand'] = $full_product->getBrand();
                 }
-                if ($full_product->getMpn())
+                if ($full_product->getSku())
                 {
-                    $product_data['productSKU'] = $full_product->getMpn();
+                    $product_data['productSKU'] = $full_product->getSku();
                 }
             }
             catch(Exception $e)
