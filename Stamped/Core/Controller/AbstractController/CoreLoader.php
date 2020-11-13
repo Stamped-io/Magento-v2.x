@@ -30,11 +30,9 @@ class CoreLoader implements CoreLoaderInterface
      * @param PageFactory $resultPageFactory
      */
     public function __construct(
-        Context $context,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         PageFactory $resultPageFactory
     ) {
-        parent::__construct($context);
         $this->_storeManager = $storeManager;
         $this->resultPageFactory = $resultPageFactory;
   }
