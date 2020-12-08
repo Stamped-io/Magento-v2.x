@@ -268,6 +268,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             ->scopeConfig
             ->getValue($field, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
     }
+
     public function isConfigured($store)
     {
         //check if both app_key and secret exist
@@ -277,73 +278,76 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
         return true;
     }
+
     public function getOrderProductsData($order)
     {
-        $this
-            ->_storeManager
-            ->setCurrentStore($order->getStoreId());
-        $products = $order->getAllVisibleItems(); //filter out simple products
-        $products_arr = array();
-        foreach ($products as $item)
-        {
-            $full_product = $this
-                ->_productRepository
-                ->get($item->getSku());
-            $parentId = $item->getProduct()
-                ->getId();
-            if (!empty($parentId))
-            {
-                $full_product = $this
-                    ->_productRepository
-                    ->getById($parentId);
-            }
-            $product_data = array();
-            $product_data['productId'] = $full_product->getId();
-            $product_data['productTitle'] = $full_product->getName();
-            $product_data['productUrl'] = '';
-            $product_data['productImageUrl'] = '';
-            try
-            {
-                $product_data['productUrl'] = $full_product->getUrlInStore(array(
-                    '_store' => $order->getStoreId()
-                ));
-                $this
-                    ->_appEmulation
-                    ->startEnvironmentEmulation($order->getStoredId() , \Magento\Framework\App\Area::AREA_FRONTEND, true);
-                $product_data['productImageUrl'] = $this
-                    ->_imgHelper
-                    ->init($full_product, 'product_base_image')->getUrl();
-                $this
-                    ->_appEmulation
-                    ->stopEnvironmentEmulation();
-                if ($full_product->getUpc())
-                {
-                    $product_data['productBarcode'] = $full_product->getUpc();
+        $productsData = [];
+        $groupProductsParents = [];
+
+        try {
+            foreach ($order->getAllVisibleItems() as $orderItem) {
+                try {
+                    $product = null;
+                    if ($orderItem->getProductType() === ProductTypeGrouped::TYPE_CODE) {
+                        $productOptions = $orderItem->getProductOptions();
+                        $productId = (isset($productOptions['super_product_config']) && isset($productOptions['super_product_config']['product_id'])) ? $productOptions['super_product_config']['product_id'] : null;
+                        if ($productId) {
+                            if (isset($groupProductsParents[$productId])) {
+                                $product = $groupProductsParents[$productId];
+                            } else {
+                                $product = $groupProductsParents[$productId] = $this->_productRepository->getById($productId);
+                            }
+                        }
+                    } else {
+                        $product = $orderItem->getProduct();
+                    }
+
+                    if (!($product && $product->getId())) {
+                        continue;
+                    }
+
+                    if (
+                        $orderItem->getData('amount_refunded') >= $orderItem->getData('row_total_incl_tax') ||
+                        $orderItem->getData('qty_ordered') <= ($orderItem->getData('qty_refunded') + $orderItem->getData('qty_canceled'))
+                    ) {
+                        continue;
+                    }
+
+                    $product_data = array();
+                    $product_data['productId'] = $product->getId();
+                    $product_data['productTitle'] = $product->getName();
+                    $product_data['productUrl'] = $product->getProductUrl();
+
+                    if ($orderItem->getProductType() === ProductTypeGrouped::TYPE_CODE && isset($productsData[$product->getId()])) {
+                    } else {
+                        $this->_appEmulation->startEnvironmentEmulation($order->getStoredId() , \Magento\Framework\App\Area::AREA_FRONTEND, true);
+                        $product_data['productImageUrl'] = $this->_imgHelper->init($product, 'product_base_image') -> getUrl();
+                        $this->_appEmulation->stopEnvironmentEmulation();
+
+                        if ($product->getUpc())
+                        {
+                            $product_data['productBarcode'] = $product->getUpc();
+                        }
+                        if ($product->getBrand())
+                        {
+                            $product_data['productBrand'] = $product->getBrand();
+                        }
+                        if ($product->getSku())
+                        {
+                            $product_data['productSKU'] = $product->getSku();
+                        }
+                        
+                        $product_data['productPrice'] = $orderItem->getPrice();
+                    }
+
+                    $productsData[$product->getId()] = $product_data;
+                } catch (\Exception $e) {
                 }
-                if ($full_product->getBrand())
-                {
-                    $product_data['productBrand'] = $full_product->getBrand();
-                }
-                if ($full_product->getSku())
-                {
-                    $product_data['productSKU'] = $full_product->getSku();
-                }
             }
-            catch(Exception $e)
-            {
-            }
-            $rawdescription = str_replace(array(
-                '\'',
-                '"'
-            ) , '', $full_product->getDescription());
-            $description = $this
-                ->_escaper
-                ->escapeHtml(strip_tags($rawdescription));
-            $product_data['productDescription'] = $description;
-            $product_data['productPrice'] = $item->getPrice();
-            $products_arr[] = $product_data;
+        } catch (\Exception $e) {
         }
-        return $products_arr;
+
+        return $productsData;
     }
     public function API_POST($path, $data, $store, $timeout = 30)
     {
