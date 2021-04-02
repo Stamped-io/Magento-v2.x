@@ -48,7 +48,8 @@ class Index extends \Magento\Backend\App\Action
             $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             
             $helper = $this->_objectManager->create('Stamped\Core\Helper\Data');
-            $current_store;
+            $current_store = null;
+	        $store_id = null;
             $page = 0;
             $now  = time();
             $last = $now - (60 * 60 * 24 * 180); // 180 days ago
@@ -64,17 +65,20 @@ class Index extends \Magento\Backend\App\Action
                     break;
                 }
             }
-            
-            $store_id = $current_store->getId();
-            
-            
-            if ($helper->isConfigured($current_store) == false) {
-                Mage::app()->getResponse()->setBody('Please ensure you have configured the API Public Key and Private Key in Settings.');
-                return;
+
+
+            if (isset($current_store)){
+                    $store_id = $current_store->getId();
+
+                    if ($helper->isConfigured($current_store) == false) {
+                        Mage::app()->getResponse()->setBody('Please ensure you have configured the API Public Key and Private Key in Settings.');
+                        return;
+                    }
             }
             
             $salesOrder    = $this->_objectManager->create('Magento\Sales\Model\Order');
             $orderStatuses = $helper->getConfigValue('stamped_core/stamped_settings/order_status_trigger', $current_store);
+
             if ($orderStatuses == null) {
                 $orderStatuses = array(
                     'complete'
@@ -83,13 +87,17 @@ class Index extends \Magento\Backend\App\Action
                 $orderStatuses = array_map('strtolower', (explode(',', $orderStatuses)));
             }
             
-            $salesCollection = $salesOrder->getCollection()->addFieldToFilter('status', $orderStatuses)->addFieldToFilter('store_id', $store_id)->addAttributeToFilter('created_at', array(
-                'gteq' => $from
-            ))->addAttributeToSort('created_at', 'DESC')->setPageSize(20);
-            
+            $salesCollection = $salesOrder->getCollection()->addFieldToFilter('status', $orderStatuses)
+					  ->addAttributeToFilter('created_at', array('gteq' => $from))
+					  ->addAttributeToSort('created_at', 'DESC')->setPageSize(20);
+
+	    if ($store_id != null){
+		$salesCollection = $salesCollection->addFieldToFilter('store_id', $store_id);
+	    }
             
             $pages = $salesCollection->getLastPageNumber();
-            
+
+
             do {
                 try {
                     $page++;
@@ -98,6 +106,8 @@ class Index extends \Magento\Backend\App\Action
                     $orders = array();
                     
                     foreach ($salesCollection as $order) {
+
+
                         $order_data      = array();
                         // Get the id of the orders shipping address
                         $shippingAddress = $order->getShippingAddress();
@@ -116,6 +126,7 @@ class Index extends \Magento\Backend\App\Action
                         $firstName = $order->getCustomerFirstname();
                         $lastName  = $order->getCustomerLastname();
                         
+
                         try {
                             if (!$firstName && !$lastName) {
                                 $firstName = $order->getBillingAddress()->getFirstname();
