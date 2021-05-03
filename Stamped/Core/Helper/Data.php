@@ -282,21 +282,35 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this
             ->_storeManager
             ->setCurrentStore($order->getStoreId());
+
         $products = $order->getAllVisibleItems(); //filter out simple products
         $products_arr = array();
+
         foreach ($products as $item)
         {
-            $full_product = $this
-                ->_productRepository
-                ->get($item->getSku());
-            $parentId = $item->getProduct()
-                ->getId();
+            $full_product = $this->_productRepository->get($item->getSku());
+
+            $parentId = $item->getProduct()->getId();
+            
+            if ($item->getProductType() === ProductTypeGrouped::TYPE_CODE) {
+                $productOptions = $item->getProductOptions();
+                $productId = (isset($productOptions['super_product_config']) && isset($productOptions['super_product_config']['product_id'])) ? $productOptions['super_product_config']['product_id'] : null;
+                if ($productId) {
+                    if (isset($groupProductsParents[$productId])) {
+                        $parentId = $groupProductsParents[$productId];
+                    } else {
+                        $parentId = $groupProductsParents[$productId] = $productId;
+                    }
+                }
+            } else {
+                $parentId = $item->getProduct()->getId();
+            }
+
             if (!empty($parentId))
             {
-                $full_product = $this
-                    ->_productRepository
-                    ->getById($parentId);
+                $full_product = $this->_productRepository->getById($parentId);
             }
+
             $product_data = array();
             $product_data['productId'] = $full_product->getId();
             $product_data['productTitle'] = $full_product->getName();
