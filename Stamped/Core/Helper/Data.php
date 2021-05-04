@@ -4,6 +4,8 @@
  */
 namespace Stamped\Core\Helper;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\GroupedProduct\Model\Product\Type\Grouped as ProductTypeGrouped;
+
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
