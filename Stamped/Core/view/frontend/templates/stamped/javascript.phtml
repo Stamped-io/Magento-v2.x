@@ -18,9 +18,9 @@
             }
         }
 
-        addEventListenerStamped(document, 'stamped:reviews:loaded', function(e) {
-            var ratingCount = jQuery('meta[itemprop="reviewCount"]').attr('content');
-            var ratingValue = jQuery('meta[itemprop="ratingValue"]').attr('content');
+        addEventListenerStamped(document, "stamped:reviews:loaded", function(e) {
+            var ratingCount = jQuery("meta[itemprop=reviewCount]").attr("content");
+            var ratingValue = jQuery("meta[itemprop=ratingValue]").attr("content");
             var richSnippet = {
                 "@context": "http://schema.org",
                 "@type": "Product",
