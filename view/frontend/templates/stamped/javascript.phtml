@@ -1,0 +1,50 @@
+<?php
+/** @var $block \Stamped\Core\Block\Core */
+?>
+<script>
+    require([
+        "jquery",
+        "https://cdn1.stamped.io/files/widget.min.js"
+    ], function(jQuery) {
+        StampedFn.init({
+            apiKey: '<?= $block->escapeJs($block->getApiKey()); ?>',
+            storeUrl: '<?= $block->escapeJs($block->getApiStoreUrl()); ?>'
+        });
+
+        function addEventListenerStamped(el, eventName, handler) {
+            if (el.addEventListener) {
+                el.addEventListener(eventName, handler);
+            } else {
+                el.attachEvent('on' + eventName, function() {
+                    handler.call(el);
+                });
+            }
+        }
+
+        addEventListenerStamped(document, "stamped:reviews:loaded", function(e) {
+            var ratingCount = jQuery("meta[itemprop=reviewCount]").attr("content");
+            var ratingValue = jQuery("meta[itemprop=ratingValue]").attr("content");
+            var richSnippet = {
+                "@context": "http://schema.org",
+                "@type": "Product",
+                "name": document.title
+            }
+
+            if (parseInt(ratingValue) > 0) {
+                richSnippet.aggregateRating = {
+                    "@type": "AggregateRating",
+                    "ratingValue": ratingValue,
+                    "reviewCount": ratingCount
+                }
+            }
+
+            var script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.innerHTML = JSON.stringify(richSnippet);
+            document.getElementsByTagName('head')[0].appendChild(script);
+        });
+    })
+</script>
+<?php if ($block->getLauncherShow()): ?>
+    <?= $block->getRewardsInit(); // phpcs:disable ?>
+<?php endif ?>

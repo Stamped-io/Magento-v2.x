@@ -1,3 +1,8 @@
-## Latest Stamped.io Extension Magento v2
+# Magento-v2.x
 
-Tested with Magento 2.4
+Latest working extension for Magento version 2.x
+
+Installation Instructions:
+
+> Stamped Module for Magento 2, you need to unzip it and place it in app/code folder
+<br> > then run setup upgrade command : php bin/magento setup:upgrade

@@ -1,0 +1,9 @@
+<?php
+/** @var $block \Stamped\Core\Block\Core */
+?>
+<span class="stamped-product-reviews-badge"
+    data-id="<?= $block->escapeHtmlAttr($block->getProductId()) ?>"
+    data-product-title="<?= $block->escapeHtmlAttr($block->getProductName()) ?>"
+    data-url="<?= $block->escapeUrl($block->getProductUrl()) ?>"
+    data-product-sku="<?= $block->escapeHtmlAttr($block->getProductSku()) ?>"
+></span>

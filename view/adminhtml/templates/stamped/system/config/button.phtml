@@ -1,0 +1,28 @@
+<div id="stamped-io-import" style="width: 245px; min-height: 120px; padding: 20px;">
+    <button id="<?= $block->getHtmlId() ?>">
+        <span><span><span><?= $block->escapeHtml($block->getButtonLabel()); ?></span></span></span>
+    </button>
+    <div class="response"></div>
+</div>
+<script type="text/javascript">
+    //<![CDATA[
+    require(['jquery'], function($) {
+        $('#stamped-io-import').on('click', 'button', function() {
+            let requestData = {'import': true};
+            $.ajax({
+                url: '<?= $block->escapeUrl($block->getInternUrl()) ?>',
+                type: 'POST',
+                data: requestData,
+                dataType: 'json',
+            }).done(function(response) {
+                let message = 'Import successful.';
+                if (response.status !== 'ok') {
+                    message = 'An error occurred during import. Check logs for more details.';
+                }
+                $('#stamped-io-import .response').text($.mage.__(message));
+            });
+            return false;
+        });
+    });
+    //]]>
+</script>
