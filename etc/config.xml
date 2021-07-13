@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <dintero>
+                <active>0</active>
+                <sandbox>1</sandbox>
+                <title>Dintero</title>
+                <is_embedded>1</is_embedded>
+                <is_express>1</is_express>
+                <payment_action>authorize_capture</payment_action>
+                <express_button_type>Dintero_Checkout::images/checkout-express-dark-round.svg</express_button_type>
+                <model>Dintero\Checkout\Model\Dintero</model>
+                <order_place_redirect_url>http://localhost/</order_place_redirect_url>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_capture_once>0</can_capture_once>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <precision>2</precision>
+                <fetch_transaction_information>1</fetch_transaction_information>
+                <logo_type>mono</logo_type>
+                <logo_color>444444</logo_color>
+                <logo_width>600</logo_width>
+                <language>en_US</language>
+            </dintero>
+        </payment>
+    </default>
+</config>
