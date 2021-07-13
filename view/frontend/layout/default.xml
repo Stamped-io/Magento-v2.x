@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <body>
-        <referenceContainer name="footer">
-            <block class="Dintero\Checkout\Block\Html\Logo" name="dintero_logo" template="Dintero_Checkout::footer-logo.phtml" />
-        </referenceContainer>
-    </body>
-</page>
