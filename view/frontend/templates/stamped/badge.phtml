@@ -2,8 +2,8 @@
 /** @var $block \Stamped\Core\Block\Core */
 ?>
 <span class="stamped-product-reviews-badge"
-    data-id="<?= $block->escapeHtmlAttr($block->getProductId()) ?>"
-    data-product-title="<?= $block->escapeHtmlAttr($block->getProductName()) ?>"
-    data-url="<?= $block->escapeUrl($block->getProductUrl()) ?>"
-    data-product-sku="<?= $block->escapeHtmlAttr($block->getProductSku()) ?>"
+    data-id="<?= $escaper->escapeHtmlAttr($block->getProductId()) ?>"
+    data-product-title="<?= $escaper->escapeHtmlAttr($block->getProductName()) ?>"
+    data-url="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"
+    data-product-sku="<?= $escaper->escapeHtmlAttr($block->getProductSku()) ?>"
 ></span>

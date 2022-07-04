@@ -3,11 +3,11 @@
 ?>
 <?php if ($block->getWidgetShow()):?>
     <div id="stamped-main-widget" class="stamped stamped-main-widget"
-        data-product-id="<?= $block->escapeHtmlAttr($block->getProductId()) ?>"
-        data-name="<?= $block->escapeHtmlAttr($block->getProductName()) ?>"
-        data-url="<?= $block->escapeUrl($block->getProductUrl()) ?>"
-        data-image-url="<?= $block->escapeUrl($block->getProductImageUrl()) ?>"
-        data-description="<?= $block->escapeHtmlAttr($block->getProductDescription()) ?>"
-        data-product-sku="<?= $block->escapeHtmlAttr($block->getProductSku()) ?>">
+        data-product-id="<?= $escaper->escapeHtmlAttr($block->getProductId()) ?>"
+        data-name="<?= $escaper->escapeHtmlAttr($block->getProductName()) ?>"
+        data-url="<?= $escaper->escapeUrl($block->getProductUrl()) ?>"
+        data-image-url="<?= $escaper->escapeUrl($block->getProductImageUrl()) ?>"
+        data-description="<?= $escaper->escapeHtmlAttr($block->getProductDescription()) ?>"
+        data-product-sku="<?= $escaper->escapeHtmlAttr($block->getProductSku()) ?>">
     </div>
 <?php endif ?>

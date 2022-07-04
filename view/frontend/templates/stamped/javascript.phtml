@@ -7,8 +7,8 @@
         "https://cdn1.stamped.io/files/widget.min.js"
     ], function(jQuery) {
         StampedFn.init({
-            apiKey: '<?= $block->escapeJs($block->getApiKey()); ?>',
-            storeUrl: '<?= $block->escapeJs($block->getApiStoreUrl()); ?>'
+            apiKey: '<?= $escaper->escapeJs($block->getApiKey()); ?>',
+            storeUrl: '<?= $escaper->escapeJs($block->getApiStoreUrl()); ?>'
         });
 
         function addEventListenerStamped(el, eventName, handler) {

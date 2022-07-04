@@ -3,6 +3,7 @@
 namespace Stamped\Core\Block;
 
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\ProductFactory;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\UrlInterface;
@@ -42,6 +43,21 @@ class Core extends \Magento\Framework\View\Element\Template
      */
     protected $registry;
 
+    /**
+     * @var \Magento\Catalog\Helper\Data
+     */
+    protected $catalogHelper;
+
+    /**
+     * @var \Magento\Catalog\Model\ProductFactory
+     */
+    protected $productFactory;
+
+    /**
+     * @var \Magento\Catalog\Model\ResourceModel\Product
+     */
+    protected $productResource;
+
     protected $customerSession;
 
     /**
@@ -51,6 +67,9 @@ class Core extends \Magento\Framework\View\Element\Template
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Stamped\Core\Model\ResourceModel\Core\CollectionFactory $coreCollectionFactory
      * @param \Stamped\Core\Helper\Data $dataHelper
+     * @param \Magento\Catalog\Helper\Data $catalogHelper
+     * @param \Magento\Catalog\Model\ProductFactory $productFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Product $productResource
      * @param \Magento\Framework\Registry $registry
      * @param array $data
      */
@@ -61,6 +80,9 @@ class Core extends \Magento\Framework\View\Element\Template
         \Stamped\Core\Helper\Data $dataHelper,
         \Magento\Framework\Registry $registry,
         \Stamped\Core\Model\ConfigProvider $configProvider,
+        \Magento\Catalog\Helper\Data $catalogHelper,
+        \Magento\Catalog\Model\ProductFactory $productFactory,
+        \Magento\Catalog\Model\ResourceModel\Product $productResource,
         array $data = []
     ) {
         $this->coreCollectionFactory = $coreCollectionFactory;
@@ -68,6 +90,9 @@ class Core extends \Magento\Framework\View\Element\Template
         $this->registry = $registry;
         $this->customerSession = $customerSession;
         $this->config = $configProvider;
+        $this->catalogHelper = $catalogHelper;
+        $this->productFactory = $productFactory;
+        $this->productResource = $productResource;
         parent::__construct($context, $data);
     }
 
@@ -194,7 +219,7 @@ class Core extends \Magento\Framework\View\Element\Template
     public function getProduct()
     {
         if (!$this->hasData('product')) {
-            $this->setData('product', $this->registry->registry('current_product'));
+            $this->setData('product', $this->catalogHelper->getProduct());
         }
 
         $objectManager = ObjectManager::getInstance();
@@ -202,7 +227,8 @@ class Core extends \Magento\Framework\View\Element\Template
         $configurable_product_model = $objectManager->get(Configurable::class);
         $parentIds = $configurable_product_model->getParentIdsByChild($product->getId());
         if (count($parentIds) > 0) {
-            $product = $objectManager->get(Product::class)->load($parentIds[0]);
+            $product = $this->productFactory->create();
+            $this->productResource->load($product, $parentIds[0]);
         }
         return $product;
     }
@@ -240,7 +266,7 @@ class Core extends \Magento\Framework\View\Element\Template
      */
     public function getProductDescription()
     {
-        return strip_tags($this->getProduct()->getShortDescription());
+        return strip_tags($this->getProduct()->getShortDescription() ?? "");
     }
 
     /**
