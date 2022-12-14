@@ -8,5 +8,8 @@
   </event>
     <event name="sales_order_status_history_collection_set_sales_order">
         <observer name="stamped_core" instance="Stamped\Core\Model\Observer\SalesOrderStatusHistory"/>
-    </event> 
+    </event>
+    <event name="customer_register_success">
+        <observer name="stamped_core" instance="Stamped\Core\Model\Observer\CustomerRegisterSuccess" />
+    </event>
 </config>
