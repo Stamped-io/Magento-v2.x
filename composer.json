@@ -1,5 +1,5 @@
 {
-    "name": "stamped-io/core",
+    "name": "stamped/core",
     "description": "N/A",
     "config": {
         "sort-packages": true
@@ -25,5 +25,5 @@
             "Stamped\\Core\\": ""
         }
     },
-    "version": "1.2.1"
+    "version": "1.2.5"
 }

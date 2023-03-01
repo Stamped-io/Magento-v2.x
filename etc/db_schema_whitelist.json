@@ -1,0 +1,15 @@
+{
+    "stamped_rich_snippets": {
+        "column": {
+            "rich_snippet_id": true,
+            "product_id": true,
+            "store_id": true,
+            "average_score": true,
+            "reviews_count": true,
+            "expiration_time": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="stamped_rich_snippets" resource="default" engine="innodb" comment="Core item">
+    <column xsi:type="int" name="rich_snippet_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+    <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Product Id"/>
+    <column xsi:type="int" name="store_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Store Id"/>
+    <column xsi:type="int" name="average_score" padding="10" unsigned="true" nullable="false" identity="false" comment="Avg Score"/>
+    <column xsi:type="int" name="reviews_count" padding="10" unsigned="true" nullable="false" identity="false" comment="Reviews Count"/>
+    <column xsi:type="timestamp" name="expiration_time" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Expiration Time"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="rich_snippet_id"/>
+    </constraint>
+  </table>
+</schema>
