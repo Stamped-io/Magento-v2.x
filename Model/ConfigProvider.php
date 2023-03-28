@@ -140,7 +140,7 @@ class ConfigProvider
     {
         return array_filter(explode(
             ',',
-            $this->scopeConfig->getValue(
+            (string) $this->scopeConfig->getValue(
                 self::STAMPED_CORE_REWARDS_TRIGGER_STATUS,
                 ScopeInterface::SCOPE_STORE,
                 $storeId
@@ -156,7 +156,7 @@ class ConfigProvider
     {
         return array_filter(explode(
             ',',
-            $this->scopeConfig->getValue(
+            (string) $this->scopeConfig->getValue(
                 self::STAMPED_CORE_ORDER_STATUS,
                 ScopeInterface::SCOPE_STORE,
                 $storeId
