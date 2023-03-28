@@ -144,7 +144,7 @@ class ConfigProvider
                 self::STAMPED_CORE_REWARDS_TRIGGER_STATUS,
                 ScopeInterface::SCOPE_STORE,
                 $storeId
-            )
+            ) ?: ''
         ));
     }
 
@@ -160,7 +160,7 @@ class ConfigProvider
                 self::STAMPED_CORE_ORDER_STATUS,
                 ScopeInterface::SCOPE_STORE,
                 $storeId
-            )
+            ) ?: ''
         ));
     }
 
