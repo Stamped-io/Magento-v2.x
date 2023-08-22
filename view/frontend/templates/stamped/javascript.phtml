@@ -8,7 +8,9 @@
     ], function(jQuery) {
         StampedFn.init({
             apiKey: '<?= $escaper->escapeJs($block->getApiKey()); ?>',
-            storeUrl: '<?= $escaper->escapeJs($block->getApiStoreUrl()); ?>'
+            storeUrl: '<?= $escaper->escapeJs($block->getApiStoreUrl()); ?>',
+            <?= $block->getStoreHash() ? "sId: '{$escaper->escapeJs($block->getStoreHash())}'" : "" ?>
+
         });
 
         function addEventListenerStamped(el, eventName, handler) {
