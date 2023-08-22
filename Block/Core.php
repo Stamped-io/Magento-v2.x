@@ -306,6 +306,14 @@ class Core extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     *@return string
+     */
+
+    public function getStoreHash() {
+        return $this->config->getHash();
+    }
+
+    /**
      * @return bool
      */
     public function getLauncherShow()
