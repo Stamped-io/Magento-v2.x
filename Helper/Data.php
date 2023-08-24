@@ -272,14 +272,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     /**
      * @param $scope
      * @return false
-     * @throws \Zend_File_Transfer_Exception
-     * @throws \Zend_Validate_Exception
      */
     public function uploadImage($scope)
     {
         $adapter = $this->httpFactory->create();
-        $adapter->addValidator(new \Zend_Validate_File_ImageSize($this->_imageSize));
-        $adapter->addValidator(new \Zend_Validate_File_FilesSize(['max' => self::MAX_FILE_SIZE]));
+        $adapter->addValidator(new \Laminas\Validator\File\ImageSize($this->_imageSize));
+        $adapter->addValidator(new \Laminas\Validator\File\FilesSize(['max' => self::MAX_FILE_SIZE]));
         if (!$adapter->isUploaded($scope)) {
             return false;
         }
